@@ -26,7 +26,7 @@ function queryProducts(){
         }
         console.log("-----------------------------------");
 
-        buyProduct(res);
+        buyProduct();
     });
         console.log(" ");
         
@@ -34,7 +34,7 @@ function queryProducts(){
 
 
 
-function buyProduct(res){
+function buyProduct(){
    inquirer.prompt(
         [{
             type: "input",
@@ -62,22 +62,36 @@ function buyProduct(res){
                     var updateStock = (res[i].stock_quantity - user.choose_qty);
                     var purchaseId = user.choose_id;
                     //console.log(updateStock, purchaseId);
+                    confirmPurchase(updateStock, purchaseId); 
+                    
                 }
 
                 else {
                     console.log("-----------------------------------");
                     console.log("Sorry that item is not in stock");
                     console.log("-----------------------------------");
-                    connection.end();
+                    inquirer.prompt(
+                        [{
+                            type: "confirm",
+                            name: "newPurchase",
+                            message: "Do you want to buy something else?",
+                            default: true
+                        }]
+                    ).then(function(userResponse){
+                        if(userResponse.newPurchase){
+                            queryProducts();
+                        }
+                        else{
+                            console.log("Ok Goodbye.");
+                            connection.end();
+                        }
+                    })
                 }
 
                 
                 
             }
-            confirmPurchase(updateStock, purchaseId);
-            console.log(updateStock, purchaseId);
-            //confirmPurchase(user.choose_qty, user.choose_id);
-            //console.log(user.choose_qty, user.choose_id);
+           
         });  
        
     });
@@ -89,68 +103,64 @@ function buyProduct(res){
             [{
                 type: "confirm",
                 name: "confirmPurchase",
-                message: "Do you want to make this purchase?"
+                message: "Do you want to make this purchase?",
+                default: true
             }]
         )
-        .then(function(updateStock, purchaseId){
-            console.log(updateStock, purchaseId)
-            connection.query("UPDATE products SET ? WHERE ?",
-            [
-                {
-                    stock_quantity: updateStock
-                },
-                {
-                    id: purchaseId
-                }
-            ],
-            function(error){
-                if (error) throw err;
-                console.log("Thank you for your purchase");
-                connection.end();
-            });               
+        .then(function(userConfirm){
+            if(userConfirm.confirmPurchase){
+                connection.query("UPDATE products SET ? WHERE ?",
+                [
+                    {
+                        stock_quantity: updateStock
+                    },
+                    
+                    {
+                        id: purchaseId
+                    }
+                ],
+                function(err){
+                    if (err) throw err;
+                    console.log("Thank you for your purchase!");
+                    console.log("-----------------------------------");
+                    inquirer.prompt(
+                        [{
+                            type: "confirm",
+                            name: "newPurchase",
+                            message: "Do you want to buy something else?",
+                            default: true
+                        }]
+                    ).then(function(userResponse){
+                        if(userResponse.newPurchase){
+                            queryProducts();
+                        }
+                        else{
+                            console.log("Ok Goodbye.");
+                            connection.end();
+                        }
+                    })
+                });   
+            }
+            else{
+                console.log("No worries.");
+                console.log("-----------------------------------");
+                inquirer.prompt(
+                    [{
+                        type: "confirm",
+                        name: "newPurchase",
+                        message: "Do you want to buy something else?",
+                        default: true
+                    }]
+                ).then(function(userResponse){
+                    if(userResponse.newPurchase){
+                        queryProducts();
+                    }
+                    else{
+                        console.log("Ok Goodbye.");
+                        connection.end();
+                    }
+                })
+            }      
         })
     }
 
-
-/*function confirmPurchase(updateStock, purchaseId){
-    
-    inquirer.prompt(
-        [{
-            type: "confirm",
-            name: "confirmPurchase",
-            message: "Do you want to make this purchase?"
-        }]
-    )
-    .then(function(updateStock, purchaseId){
-        connection.query("UPDATE products SET ? WHERE ?", 
-        [
-           {
-               stock_quantity: updateStock
-           }, 
-           {
-               id: purchaseId
-           }
-        ],function(error){
-            if (error) throw err;
-            console.log("Thank you for your purchase");
-        }
-      }
-    }
-    
-    
-
-
-   
-
-/*function confirmPurchase(qty, id){
-   //console.log(qty, id);
-    inquirer.prompt(
-        [{
-            type: "confirm",
-            name: "confirmPurchase",
-            message: "Do you want to make this purchase?"
-        }]
-    )
-    .then(function(qty, id){
-
-    }*/
