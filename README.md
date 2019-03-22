@@ -11,6 +11,6 @@ Bamazon is a Amazon-like storefront with a MySQL database storing the product in
 
 #Video Demo
 <br/>
-<a href="https://drive.google.com/file/d/1qVm4zqDSbdjZYtKEIFqfC8QD_CUujJaY/view">Video Demo</a>
+<a href="https://drive.google.com/file/d/1VWRe1tFSZ9G269qcSmeibHQZGVrCKayG/view?usp=sharing">Video Demo</a>
 <br><br/>
 © 2019 GitHub, Inc.
